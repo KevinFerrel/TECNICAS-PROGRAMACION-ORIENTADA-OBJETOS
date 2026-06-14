@@ -1,1 +1,8 @@
-/bin/
+# Eclipse
+.metadata/
+**/.metadata/
+bin/
+*.class
+
+# Configuración temporal
+*.log
