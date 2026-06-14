@@ -1,0 +1,8 @@
+.metadata/
+SistemaRefugioAnimales/.metadata/
+
+bin/
+SistemaRefugioAnimales/bin/
+*.class
+
+*.log
