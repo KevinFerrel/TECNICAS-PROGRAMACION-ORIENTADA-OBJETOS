@@ -1,10 +1,18 @@
 package persistencia;
 
-import java.io.File;
-import mslinks.ShellLink;
+//import java.io.File;
+//import mslinks.ShellLink; de momento no lo usaremos
 
 public class AccesoDirectoManager {
-    
+
+    public void crearAccesosDirectos() {
+        System.out.println("Accesos directos pendientes de implementación.");
+        System.out.println("Para activar esta función se necesita agregar mslinks.jar al Build Path.");
+    }
+}
+/*Codigo por implementar.
+ * public class AccesoDirectoManager {
+     
     public void crearAccesosDirectos() {
         try {
             // Se localiza la ruta absoluta del escritorio del sistema operativo anfitrión
@@ -28,4 +36,4 @@ public class AccesoDirectoManager {
             System.out.println("Advertencia: No se pudieron generar los accesos directos. Asegúrese de incluir mslinks.jar en el Build Path.");
         }
     }
-}
+    */

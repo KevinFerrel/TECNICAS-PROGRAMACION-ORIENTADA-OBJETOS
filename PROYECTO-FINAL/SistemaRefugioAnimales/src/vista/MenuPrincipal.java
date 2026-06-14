@@ -55,7 +55,7 @@ public class MenuPrincipal {
 
         // Paso F: Guardado en Disco
         System.out.println("\n--- EXPORTACIÓN DE DATOS (EXCEL) ---");
-        excel.respaldarMascotas(animalesController.getTodas());
+        excel.respaldarMascotas(animalesController.listarTodas());
         excel.respaldarAdoptantes(personasController.obtenerTodos());
         excel.respaldarDevoluciones(tramiteController.obtenerTodas()); // Genera el nuevo excel
         

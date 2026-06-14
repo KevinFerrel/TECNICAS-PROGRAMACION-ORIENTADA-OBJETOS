@@ -1,15 +1,37 @@
 package persistencia;
-
-import java.io.File;
-import java.io.FileOutputStream;
+//import java.io.File;
+//import java.io.FileOutputStream;
 import java.util.List;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+//import org.apache.poi.ss.usermodel.*;
+//import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import modelo.Mascota;
 import modelo.Adoptante;
 import modelo.Adopcion;
 
 public class ExcelManager {
+
+    public ExcelManager() {
+        // Constructor temporal.
+        System.out.println("ExcelManager iniciado en modo temporal.");
+    }
+
+    public void respaldarMascotas(List<Mascota> mascotas) {
+        System.out.println("Respaldo de mascotas pendiente de implementación.");
+        System.out.println("Para activar esta función se necesita agregar Apache POI al Build Path.");
+    }
+
+    public void respaldarAdoptantes(List<Adoptante> adoptantes) {
+        System.out.println("Respaldo de adoptantes pendiente de implementación.");
+        System.out.println("Para activar esta función se necesita agregar Apache POI al Build Path.");
+    }
+
+    public void respaldarDevoluciones(List<Adopcion> expedientes) {
+        System.out.println("Respaldo de devoluciones pendiente de implementación.");
+        System.out.println("Para activar esta función se necesita agregar Apache POI al Build Path.");
+    }
+}
+/*public class ExcelManager {
+	
     // Carpeta local que debe existir o crearse en la raíz del proyecto
     private static final String RUTA_CARPETA = "datos";
 
@@ -98,4 +120,5 @@ public class ExcelManager {
             System.out.println("❌ Error al guardar " + nombreArchivo + ": " + e.getMessage());
         }
     }
-}
+} 
+*/
