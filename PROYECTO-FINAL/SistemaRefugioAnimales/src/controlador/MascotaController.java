@@ -6,110 +6,125 @@ import java.util.List;
 import modelo.Mascota;
 
 public class MascotaController {
-    // Colección en memoria que actúa como repositorio temporal antes de enviarse a Excel
     private List<Mascota> listaMascotas = new ArrayList<>();
 
-    // HU01 / RF01: Registrar una nueva mascota validando unicidad de ID
+    // ======== MÉTODOS PRINCIPALES ========
+
     public boolean registrarMascota(String idMascota, String nombre, String especie, String raza, LocalDate fechaRescate) {
         if (buscarPorId(idMascota) != null) {
-            System.out.println("Error: El código identificador '" + idMascota + "' ya se encuentra registrado.");
+            System.out.println("❌ ID ya registrado: " + idMascota);
             return false;
         }
-        Mascota nuevaMascota = new Mascota(idMascota, nombre, especie, raza, fechaRescate);
-        listaMascotas.add(nuevaMascota);
+        Mascota nueva = new Mascota(idMascota, nombre, especie, raza, fechaRescate);
+        listaMascotas.add(nueva);
         return true;
     }
 
-    // RF02: Modificar los datos descriptivos básicos de una mascota existente
     public boolean modificarMascota(String idMascota, String nuevoNombre, String nuevaEspecie, String nuevaRaza) {
-        Mascota mascota = buscarPorId(idMascota);
-        if (mascota == null || !mascota.isActivo()) return false;
-        
-        mascota.setNombre(nuevoNombre);
-        mascota.setEspecie(nuevaEspecie);
-        mascota.setRaza(nuevaRaza);
+        Mascota m = buscarPorId(idMascota);
+        if (m == null || !m.isActivo()) return false;
+        m.setNombre(nuevoNombre);
+        m.setEspecie(nuevaEspecie);
+        m.setRaza(nuevaRaza);
         return true;
     }
 
-    // HU02 / RF03 & UML: actualizarEstado() cambia el flujo operativo del animal
     public boolean actualizarEstado(String idMascota, String nuevoEstado) {
-        Mascota mascota = buscarPorId(idMascota);
-        if (mascota == null || !mascota.isActivo()) return false;
-
-        if (nuevoEstado.equals("Disponible") || nuevoEstado.equals("En cuarentena") || 
-            nuevoEstado.equals("En tratamiento") || nuevoEstado.equals("Adoptada") ||
-            nuevoEstado.equals("En proceso de adopción")) {
-            mascota.setEstado(nuevoEstado);
-            return true;
+        Mascota m = buscarPorId(idMascota);
+        if (m == null || !m.isActivo()) return false;
+        String[] validos = {"Disponible", "En cuarentena", "En tratamiento", "Adoptada", "En proceso de adopción"};
+        for (String e : validos) {
+            if (e.equalsIgnoreCase(nuevoEstado)) {
+                m.setEstado(nuevoEstado);
+                return true;
+            }
         }
-        System.out.println("Error: Estado operativo no válido para el sistema.");
+        System.out.println("❌ Estado no válido.");
         return false;
     }
 
-    // RF04: Ejecutar la baja lógica de la mascota en caso de fallecimiento
     public boolean darDeBajaPorFallecimiento(String idMascota) {
-        Mascota mascota = buscarPorId(idMascota);
-        if (mascota == null) return false;
-        
-        mascota.setActivo(false);
-        mascota.setEstado("Baja");
+        Mascota m = buscarPorId(idMascota);
+        if (m == null) return false;
+        m.setActivo(false);
+        m.setEstado("Baja");
         return true;
     }
 
-    // RF05 & UML: Buscar una mascota por su ID único
+    public boolean ponerEnCuarentena(String idMascota, String motivo) {
+        Mascota m = buscarPorId(idMascota);
+        if (m == null) return false;
+        m.setEstado("En cuarentena");
+        System.out.println("✔ Mascota " + idMascota + " en cuarentena. Motivo: " + motivo);
+        return true;
+    }
+
+    // ======== MÉTODOS DE CONSULTA ========
+
     public Mascota buscarPorId(String idMascota) {
         for (Mascota m : listaMascotas) {
-            if (m.getIdMascota().equalsIgnoreCase(idMascota)) {
-                return m;
-            }
+            if (m.getIdMascota().equalsIgnoreCase(idMascota)) return m;
         }
         return null;
     }
 
-    // RF05: Buscar coincidencias de mascotas por su nombre
     public List<Mascota> buscarPorNombre(String nombre) {
-        List<Mascota> resultados = new ArrayList<>();
+        List<Mascota> res = new ArrayList<>();
         for (Mascota m : listaMascotas) {
-            if (m.getNombre().equalsIgnoreCase(nombre) && m.isActivo()) {
-                resultados.add(m);
-            }
+            if (m.getNombre().equalsIgnoreCase(nombre) && m.isActivo()) res.add(m);
         }
-        return resultados;
+        return res;
     }
 
-    // HU02 / RF06: Retornar el listado completo de mascotas registradas
-    public List<Mascota> listarTodas() {
-        return listaMascotas;
-    }
+    public List<Mascota> listarTodas() { return listaMascotas; }
 
-    // RF07: Filtrar y listar únicamente los animales con estado "Disponible"
     public List<Mascota> listarDisponibles() {
-        List<Mascota> disponibles = new ArrayList<>();
+        List<Mascota> res = new ArrayList<>();
         for (Mascota m : listaMascotas) {
-            if (m.isActivo() && m.getEstado().equals("Disponible")) {
-                disponibles.add(m);
-            }
+            if (m.isActivo() && m.getEstado().equals("Disponible")) res.add(m);
         }
-        return disponibles;
+        return res;
     }
 
-    // RF08: Guardar las especificaciones y rasgos físicos detallados
+    public List<Mascota> obtenerDisponibles() {
+        return listarDisponibles();
+    }
+
     public boolean registrarDescripcionFisica(String idMascota, String color, String tamano, String marcas) {
         Mascota m = buscarPorId(idMascota);
         if (m == null || !m.isActivo()) return false;
-        
         m.setColor(color);
         m.setTamano(tamano);
         m.setMarcasParticulares(marcas);
         return true;
     }
 
-    // RF09: Anotar observaciones conductuales críticas detectadas
     public boolean registrarObservacionesConducta(String idMascota, String observaciones) {
         Mascota m = buscarPorId(idMascota);
         if (m == null || !m.isActivo()) return false;
-        
         m.setObservacionesConducta(observaciones);
         return true;
+    }
+
+    // ======== MÉTODOS PARA PERSISTENCIA ========
+
+    public void setListaMascotas(List<Mascota> lista) { this.listaMascotas = lista; }
+    public List<Mascota> getListaMascotas() { return listaMascotas; }
+
+    // ======== MÉTODO PARA LISTAR CON ÍNDICE (USADO EN ADOPCIONES) ========
+
+    public void listarDisponiblesConIndice() {
+        List<Mascota> disponibles = listarDisponibles();
+        if (disponibles.isEmpty()) {
+            System.out.println("No hay mascotas disponibles.");
+        } else {
+            System.out.println("\n--- MASCOTAS DISPONIBLES ---");
+            System.out.printf("%-3s %-10s %-15s %-10s %-20s%n", "Nº", "ID", "Nombre", "Especie", "Foto");
+            for (int i = 0; i < disponibles.size(); i++) {
+                Mascota m = disponibles.get(i);
+                System.out.printf("%-3d %-10s %-15s %-10s %-20s%n", 
+                    (i+1), m.getIdMascota(), m.getNombre(), m.getEspecie(), m.getRutaFoto());
+            }
+        }
     }
 }

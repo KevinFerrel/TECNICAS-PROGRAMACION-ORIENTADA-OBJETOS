@@ -13,81 +13,64 @@ public class HistorialMedicoController {
     private List<CitaMedica> listadoCitas = new ArrayList<>();
     private List<Tratamiento> listadoTratamientos = new ArrayList<>();
     private List<Vacuna> listadoVacunas = new ArrayList<>();
-
-    // Contadores correlativos para autogenerar IDs textuales estables
     private int controlCitas = 1;
     private int controlTratamientos = 1;
     private int controlVacunas = 1;
 
-    // RF11 & UML: programarCita() inicializa una nueva atención médica
     public CitaMedica programarCita(String idMascota, LocalDateTime fechaHora) {
-        String idGenerado = "CIT-" + (controlCitas++);
-        CitaMedica nuevaCita = new CitaMedica(idGenerado, idMascota, fechaHora);
-        listadoCitas.add(nuevaCita);
-        return nuevaCita;
+        String id = "CIT-" + (controlCitas++);
+        CitaMedica c = new CitaMedica(id, idMascota, fechaHora);
+        listadoCitas.add(c);
+        return c;
     }
 
-    // RF12: Registrar la evaluación morfométrica del animal
     public boolean registrarPesoTalla(String idCita, double peso, double talla) {
-        CitaMedica cita = buscarCitaPorId(idCita);
-        if (cita == null) return false;
-        
-        cita.setPeso(peso);
-        cita.setTalla(talla);
+        CitaMedica c = buscarCitaPorId(idCita);
+        if (c == null) return false;
+        c.setPeso(peso);
+        c.setTalla(talla);
         return true;
     }
 
-    // RF13: Cargar el veredicto médico veterinario y pasar la cita a 'Atendida'
     public boolean registrarDiagnostico(String idCita, String diagnostico) {
-        CitaMedica cita = buscarCitaPorId(idCita);
-        if (cita == null) return false;
-        
-        cita.setDiagnostico(diagnostico);
-        cita.setEstado("Atendida");
+        CitaMedica c = buscarCitaPorId(idCita);
+        if (c == null) return false;
+        c.setDiagnostico(diagnostico);
+        c.setEstado("Atendida");
         return true;
     }
 
-    // RF14 & UML: cancelarCita() cambia el estado operativo de una cita pendiente
     public boolean cancelarCita(String idCita) {
-        CitaMedica cita = buscarCitaPorId(idCita);
-        if (cita == null || !cita.getEstado().equals("Pendiente")) return false;
-        
-        cita.setEstado("Cancelada");
+        CitaMedica c = buscarCitaPorId(idCita);
+        if (c == null || !c.getEstado().equals("Pendiente")) return false;
+        c.setEstado("Cancelada");
         return true;
     }
 
-    // RF14: Modificar la planificación temporal de la cita veterinaria
-    public boolean reprogramarCita(String idCita, LocalDateTime nuevaFechaHora) {
-        CitaMedica cita = buscarCitaPorId(idCita);
-        if (cita == null || !cita.getEstado().equals("Pendiente")) return false;
-        
-        cita.setFechaHora(nuevaFechaHora);
-        cita.setEstado("Reprogramada");
+    public boolean reprogramarCita(String idCita, LocalDateTime nuevaFecha) {
+        CitaMedica c = buscarCitaPorId(idCita);
+        if (c == null || !c.getEstado().equals("Pendiente")) return false;
+        c.setFechaHora(nuevaFecha);
+        c.setEstado("Reprogramada");
         return true;
     }
 
-    // HU03 / RF15: Devolver el listado de citas ordenadas por fecha cronológica
     public List<CitaMedica> obtenerHistorialCitas(String idMascota) {
-        List<CitaMedica> filtradas = new ArrayList<>();
+        List<CitaMedica> res = new ArrayList<>();
         for (CitaMedica c : listadoCitas) {
-            if (c.getIdMascota().equalsIgnoreCase(idMascota)) {
-                filtradas.add(c);
-            }
+            if (c.getIdMascota().equalsIgnoreCase(idMascota)) res.add(c);
         }
-        // Ordenamiento burbuja o lambda básico para asegurar el orden cronológico exigido
-        filtradas.sort((c1, c2) -> c1.getFechaHora().compareTo(c2.getFechaHora()));
-        return filtradas;
+        res.sort((c1, c2) -> c1.getFechaHora().compareTo(c2.getFechaHora()));
+        return res;
     }
 
-    // HU05 / RF16: Instanciar un esquema de tratamiento farmacológico
     public Tratamiento iniciarTratamientoMedico(String idMascota, String descripcion, int duracionDias) {
-        String idGenerado = "TRAT-" + (controlTratamientos++);
-        Tratamiento nuevoTratamiento = new Tratamiento(idGenerado, idMascota, descripcion, duracionDias);
-        listadoTratamientos.add(nuevoTratamiento);
-        return nuevoTratamiento;
+        String id = "TRAT-" + (controlTratamientos++);
+        Tratamiento t = new Tratamiento(id, idMascota, descripcion, duracionDias);
+        listadoTratamientos.add(t);
+        return t;
     }
 
-    // RF17: Modificar el estado del proceso curativo activo
     public boolean actualizarEstadoTratamiento(String idTratamiento, String nuevoEstado) {
         for (Tratamiento t : listadoTratamientos) {
             if (t.getIdTratamiento().equalsIgnoreCase(idTratamiento)) {
@@ -98,7 +81,6 @@ public class HistorialMedicoController {
         return false;
     }
 
-    // HU05 / RF18: Vincular una nueva medicina al tratamiento correspondiente
     public boolean asociarMedicinaATratamiento(String idTratamiento, String nombreMed, String dosis) {
         for (Tratamiento t : listadoTratamientos) {
             if (t.getIdTratamiento().equalsIgnoreCase(idTratamiento)) {
@@ -109,76 +91,59 @@ public class HistorialMedicoController {
         return false;
     }
 
-    // HU03 / RF19: Registrar la inoculación biológica de una vacuna
     public Vacuna registrarAplicacionVacuna(String idMascota, String nombreVacuna, String laboratorio, LocalDate fecha) {
-        String idGenerado = "VAC-" + (controlVacunas++);
-        Vacuna nuevaVacuna = new Vacuna(idGenerado, idMascota, nombreVacuna, laboratorio);
-        nuevaVacuna.registrarAplicacion(fecha);
-        listadoVacunas.add(nuevaVacuna);
-        return nuevaVacuna;
+        String id = "VAC-" + (controlVacunas++);
+        Vacuna v = new Vacuna(id, idMascota, nombreVacuna, laboratorio);
+        v.registrarAplicacion(fecha);
+        listadoVacunas.add(v);
+        return v;
     }
 
-    // HU04 / RF20: Dejar programado en el sistema un refuerzo o dosis futura
     public boolean programarProximaDosisVacuna(String idMascota, String nombreVacuna, String laboratorio, LocalDate fechaProxima) {
-        String idGenerado = "VAC-" + (controlVacunas++);
-        Vacuna vacunaAgendada = new Vacuna(idGenerado, idMascota, nombreVacuna, laboratorio);
-        vacunaAgendada.setFechaProximaDosis(fechaProxima);
-        vacunaAgendada.setPendiente(true);
-        listadoVacunas.add(vacunaAgendada);
+        String id = "VAC-" + (controlVacunas++);
+        Vacuna v = new Vacuna(id, idMascota, nombreVacuna, laboratorio);
+        v.setFechaProximaDosis(fechaProxima);
+        v.setPendiente(true);
+        listadoVacunas.add(v);
         return true;
     }
 
-    // HU04 / RF21: Listar exclusivamente las vacunas que están pendientes de aplicación
     public List<Vacuna> obtenerVacunasPendientes(String idMascota) {
-        List<Vacuna> pendientes = new ArrayList<>();
+        List<Vacuna> res = new ArrayList<>();
         for (Vacuna v : listadoVacunas) {
-            if (v.getIdMascota().equalsIgnoreCase(idMascota) && v.isPendiente()) {
-                pendientes.add(v);
-            }
+            if (v.getIdMascota().equalsIgnoreCase(idMascota) && v.isPendiente()) res.add(v);
         }
-        return pendientes;
+        return res;
     }
 
-    // RF22: Generar y retornar el resumen textual consolidado del historial clínico
     public String generarResumenClinicoConsolidado(String idMascota) {
         StringBuilder sb = new StringBuilder();
-        sb.append("====================================================\n");
-        sb.append("   RESUMEN CONSOLIDADO HISTORIAL CLÍNICO: ").append(idMascota).append("\n");
-        sb.append("====================================================\n\n");
-
-        sb.append(">> CRONOLOGÍA DE CITAS MÉDICAS:\n");
-        List<CitaMedica> citas = obtenerHistorialCitas(idMascota);
-        if (citas.isEmpty()) sb.append("   (Sin registros de citas médicas)\n");
-        for (CitaMedica c : citas) sb.append("   - ").append(c.toString()).append("\n");
-
-        sb.append("\n>> TRATAMIENTOS MÉDICOS ASIGNADOS:\n");
-        boolean tieneTratamiento = false;
+        sb.append("=== RESUMEN CLÍNICO DE ").append(idMascota).append(" ===\n");
+        sb.append("Citas:\n");
+        for (CitaMedica c : obtenerHistorialCitas(idMascota)) sb.append(" - ").append(c).append("\n");
+        sb.append("Tratamientos:\n");
         for (Tratamiento t : listadoTratamientos) {
-            if (t.getIdMascota().equalsIgnoreCase(idMascota)) {
-                sb.append("   - ").append(t.toString()).append("\n");
-                tieneTratamiento = true;
-            }
+            if (t.getIdMascota().equalsIgnoreCase(idMascota)) sb.append(" - ").append(t).append("\n");
         }
-        if (!tieneTratamiento) sb.append("   (Sin tratamientos asignados)\n");
-
-        sb.append("\n>> HISTORIAL DE VACUNACIÓN:\n");
-        boolean tieneVacunas = false;
+        sb.append("Vacunas:\n");
         for (Vacuna v : listadoVacunas) {
-            if (v.getIdMascota().equalsIgnoreCase(idMascota)) {
-                sb.append("   - ").append(v.toString()).append("\n");
-                tieneVacunas = true;
-            }
+            if (v.getIdMascota().equalsIgnoreCase(idMascota)) sb.append(" - ").append(v).append("\n");
         }
-        if (!tieneVacunas) sb.append("   (Sin vacunas registradas)\n");
-        
         return sb.toString();
     }
 
-    // Métodos utilitarios internos de búsqueda
     private CitaMedica buscarCitaPorId(String idCita) {
         for (CitaMedica c : listadoCitas) {
             if (c.getIdCita().equalsIgnoreCase(idCita)) return c;
         }
         return null;
     }
+
+    // Para persistencia
+    public void setListadoCitas(List<CitaMedica> lista) { this.listadoCitas = lista; }
+    public List<CitaMedica> getListadoCitas() { return listadoCitas; }
+    public void setListadoTratamientos(List<Tratamiento> lista) { this.listadoTratamientos = lista; }
+    public List<Tratamiento> getListadoTratamientos() { return listadoTratamientos; }
+    public void setListadoVacunas(List<Vacuna> lista) { this.listadoVacunas = lista; }
+    public List<Vacuna> getListadoVacunas() { return listadoVacunas; }
 }
